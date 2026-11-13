@@ -53,3 +53,12 @@ export const getAccessibleTodoOrNull = async (req, todoId) => {
   const row = await Todo.findOne({ where: { id: todoId, userId: req.user.id } });
   return row ?? null;
 };
+
+export const getAccessibleUserOrNull = async (req, userId) => {
+  if (userId !== req.user.id) {
+    return null;
+  }
+
+  const row = await User.unscoped().findByPk(userId);
+  return row ?? null;
+};

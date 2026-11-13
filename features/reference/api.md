@@ -1,6 +1,6 @@
 # API Reference
 
-**Status:** current after Feature 3 (todos).
+**Status:** current after Feature 4 (profile).
 
 Base path: `/todo`. Authenticated routes send `Authorization: Bearer <token>`.
 
@@ -12,6 +12,8 @@ Base path: `/todo`. Authenticated routes send `Authorization: Bearer <token>`.
 | `POST` | `/todo/register` | No | Create account and session |
 | `POST` | `/todo/login` | No | Authenticate; reuse a non-expired session when one exists |
 | `POST` | `/todo/logout` | Yes | Invalidate the current session token |
+| `GET` | `/todo/users/:id` | Yes | Fetch the authenticated user's profile (self only) |
+| `PUT` | `/todo/users/:id` | Yes | Update the authenticated user's profile (self only) |
 | `GET` | `/todo/lists` | Yes | Owned lists, ordered by name |
 | `POST` | `/todo/lists` | Yes | Create a list owned by `req.user.id` |
 | `PUT` | `/todo/lists/:listId` | Yes | Rename an owned list |
@@ -36,6 +38,23 @@ Base path: `/todo`. Authenticated routes send `Authorization: Bearer <token>`.
 ```
 
 Password hashes are never returned.
+
+## Profile success payload (`GET /todo/users/:id` `200`, `PUT /todo/users/:id` `200`)
+
+```json
+{
+  "id": 42,
+  "fName": "Jane",
+  "lName": "Doe",
+  "email": "jane@example.com",
+  "username": "jdoe",
+  "role": "worker",
+  "createdAt": "2026-07-02T12:00:00.000Z",
+  "updatedAt": "2026-07-02T12:05:00.000Z"
+}
+```
+
+`PUT` body includes `fName`, `lName`, `email`, `username`, and optional `password`. Omit `password` to leave the hash unchanged. `role` is not editable.
 
 ## List success payload (`POST /todo/lists` `201`, `PUT /todo/lists/:listId` `200`)
 
@@ -78,11 +97,13 @@ Create body: `{ "title": "Buy milk" }`. `userId` and `listId` are set from the s
 | Duplicate username | `400` | `Username is already taken.` |
 | Duplicate email | `400` | `Email is already registered.` |
 | Missing email (register) | `400` | `Email is required.` |
-| Password shorter than 8 (register) | `400` | `Password must be at least 8 characters.` |
+| Password shorter than 8 (register / profile) | `400` | `Password must be at least 8 characters.` |
 | Missing username (login/register) | `400` | `Username is required.` |
 | Missing password (login/register) | `400` | `Password is required.` |
+| Missing first name (profile) | `400` | `First name is required.` |
 | Bad credentials | `401` | `Invalid username or password.` |
 | Missing / invalid / expired token | `401` | `Unauthorized! …` |
+| User not found or not self | `404` | `User with id=<id> not found.` |
 | Empty list name | `400` | `List name is required.` |
 | List name longer than 100 | `400` | `List name must be 100 characters or fewer.` |
 | Invalid list id | `400` | `Invalid list id.` |
@@ -99,3 +120,4 @@ Create body: `{ "title": "Buy milk" }`. `userId` and `listId` are set from the s
 | Auth register / login / logout | Feature 1 |
 | List CRUD | Feature 2 |
 | Todo CRUD (list-scoped) | Feature 3 |
+| Profile GET / PUT (self only) | Feature 4 |

@@ -1,6 +1,6 @@
 # Data Model Reference
 
-**Status:** current after Feature 3 (todos).
+**Status:** current after Feature 4 (profile).
 
 Sequelize adds `id`, `createdAt`, and `updatedAt` on each table.
 
@@ -11,12 +11,12 @@ Sequelize adds `id`, `createdAt`, and `updatedAt` on each table.
 | Field | Type | Rules |
 |-------|------|-------|
 | `id` | INTEGER PK | Auto-increment |
-| `fName` | STRING | Required |
-| `lName` | STRING | Required |
-| `email` | STRING | Required, unique |
-| `username` | STRING(100) | Required, unique; stored lowercase |
-| `password` | STRING(255) | Required; bcrypt hash only; excluded from default scope |
-| `role` | STRING(20) | Default `worker` |
+| `fName` | STRING | Required; editable via `PUT /todo/users/:id` |
+| `lName` | STRING | Required; editable via `PUT /todo/users/:id` |
+| `email` | STRING | Required, unique; editable via `PUT /todo/users/:id` |
+| `username` | STRING(100) | Required, unique; stored lowercase; editable via `PUT /todo/users/:id` |
+| `password` | STRING(255) | Required; bcrypt hash only; excluded from default scope; optional on profile update |
+| `role` | STRING(20) | Default `worker`; read-only in this product |
 
 ### `sessions`
 
@@ -64,3 +64,4 @@ Sequelize adds `id`, `createdAt`, and `updatedAt` on each table.
 | `users`, `sessions` | Feature 1 |
 | `lists` | Feature 2 |
 | `todos` | Feature 3 |
+| Profile edits on `users` (no new tables) | Feature 4 |

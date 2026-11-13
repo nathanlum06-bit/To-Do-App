@@ -1,6 +1,6 @@
 # Behavior & Rules Reference
 
-**Living snapshot** of product rules currently in force (Feature 3).
+**Living snapshot** of product rules currently in force (Feature 4).
 
 These files answer: *"What rules does the app enforce right now?"*  
 They do **not** authorize new scope — implement only from `features/feature-*.md`.
@@ -18,6 +18,18 @@ They do **not** authorize new scope — implement only from `features/feature-*.
 | Logout clears the session token on the server row | `POST /todo/logout` | Feature 1 |
 | Missing/invalid/expired token → `401` `{ message: "Unauthorized! …" }` | `authenticate` | Feature 1 |
 | Authenticated requests resolve `req.user.id` from the session | `authenticate` | Feature 1 |
+
+## Profile
+
+| Rule | Enforcement | Introduced |
+|------|-------------|------------|
+| All profile endpoints require `authenticate` | `user.routes` | Feature 4 |
+| `GET` / `PUT /todo/users/:id` succeed only when `:id = req.user.id` | `getAccessibleUserOrNull` | Feature 4 |
+| Cross-user profile access returns `404` (never `403`) | `user.controller` | Feature 4 |
+| Names/email trimmed; username `trim().toLowerCase()`; empty required fields → `400` | `user.controller` update | Feature 4 |
+| Password optional on update; when set, min 8 chars and bcrypt `SALT_ROUNDS = 10` | `user.controller` update | Feature 4 |
+| Password hashes never in profile responses | `toProfile` | Feature 4 |
+| `role` is not editable | `user.controller` update | Feature 4 |
 
 ## Lists
 
@@ -53,7 +65,10 @@ They do **not** authorize new scope — implement only from `features/feature-*.
 | Signed-in visit to login → home | `router.beforeEach` | Feature 1 |
 | Axios attaches Bearer token; 401 clears `user` and routes to login | `services.js` | Feature 1 |
 | Register email uses shared `emailRules` (required + regex; **"Enter a valid email address."**) | `frontend/src/config/validation.js` | Feature 1 |
-| `MenuBar` shows signed-in name and **Sign out**; hidden on login/register | `MenuBar.vue` / `App.vue` | Feature 2 |
+| `MenuBar` shows a user icon profile dropdown (**Edit Profile**, **Log out**); hidden on login/register | `MenuBar.vue` / `App.vue` | Feature 2; Feature 4 |
+| Standalone menu-bar **Sign out** is removed; logout is **Log out** in the profile dropdown | `MenuBar.vue` | Feature 4 |
+| After profile save, `localStorage` key `user` is refreshed and `user-logged-in` is dispatched | `MenuBar.vue` | Feature 4 |
+| Edit Profile uses shared `emailRules` | `validation.js` | Feature 4 |
 | Dashboard is a single lists view (**My Lists**, `+ New List`, edit/delete dialogs) | `Dashboard.vue` | Feature 2 |
 | Empty lists copy: **"No lists yet. Create your first list."** | `Dashboard.vue` | Feature 2 |
 | List rows include an **Items** icon that opens a list-items dialog | `Dashboard.vue` | Feature 3 |
@@ -69,3 +84,4 @@ They do **not** authorize new scope — implement only from `features/feature-*.
 | Auth, sessions | Feature 1 |
 | Owned lists CRUD and dashboard lists view | Feature 2 |
 | Owned todos CRUD and list-items dialogs | Feature 3 |
+| Self-only profile GET/PUT and menu-bar profile dropdown | Feature 4 |
