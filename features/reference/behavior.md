@@ -1,6 +1,6 @@
 # Behavior & Rules Reference
 
-**Living snapshot** of product rules currently in force (Feature 2).
+**Living snapshot** of product rules currently in force (Feature 3).
 
 These files answer: *"What rules does the app enforce right now?"*  
 They do **not** authorize new scope — implement only from `features/feature-*.md`.
@@ -29,6 +29,20 @@ They do **not** authorize new scope — implement only from `features/feature-*.
 | Cross-user list access returns `404` (never `403`) | `list.controller` | Feature 2 |
 | List names trimmed; empty → `400`; over 100 chars → `400` | `validateName` | Feature 2 |
 | Lists ordered alphabetically by name | `findAll` `order: name ASC` | Feature 2 |
+| Deleting a list deletes its todos | `List hasMany Todo` `onDelete: CASCADE` | Feature 3 |
+
+## Todos
+
+| Rule | Enforcement | Introduced |
+|------|-------------|------------|
+| All todo endpoints require `authenticate` | `list.routes` / `todo.routes` | Feature 3 |
+| Parent list must be owned by `req.user.id` before create or list-scoped read | `getAccessibleListOrNull` | Feature 3 |
+| `userId` and `listId` on create come from session + route, not the body | `todo.controller` create | Feature 3 |
+| `GET` / `PUT` / `DELETE` on a todo scope to `{ id, userId: req.user.id }` | `getAccessibleTodoOrNull` | Feature 3 |
+| Cross-user todo or parent-list access returns `404` (never `403`) | `todo.controller` | Feature 3 |
+| Titles trimmed; empty → `400`; over 255 chars → `400` | `validateTitle` | Feature 3 |
+| New todos default to `completed: false` | `Todo.create` | Feature 3 |
+| Todos ordered incomplete first, then `createdAt` ascending | `findAll` order | Feature 3 |
 
 ## Client (UX, not enforcement)
 
@@ -42,6 +56,11 @@ They do **not** authorize new scope — implement only from `features/feature-*.
 | `MenuBar` shows signed-in name and **Sign out**; hidden on login/register | `MenuBar.vue` / `App.vue` | Feature 2 |
 | Dashboard is a single lists view (**My Lists**, `+ New List`, edit/delete dialogs) | `Dashboard.vue` | Feature 2 |
 | Empty lists copy: **"No lists yet. Create your first list."** | `Dashboard.vue` | Feature 2 |
+| List rows include an **Items** icon that opens a list-items dialog | `Dashboard.vue` | Feature 3 |
+| Todo add/edit/delete use nested dialogs; **+ Add Item** is not on the main lists view | `Dashboard.vue` | Feature 3 |
+| Empty todos copy: **"No todos in this list yet."** | `Dashboard.vue` | Feature 3 |
+| Empty todo title blocked client-side: **"Todo title is required."** | `Dashboard.vue` | Feature 3 |
+| Completed todos are struck-through / muted | `Dashboard.vue` `.todo-completed` | Feature 3 |
 
 ## Feature provenance
 
@@ -49,3 +68,4 @@ They do **not** authorize new scope — implement only from `features/feature-*.
 |------|------------|
 | Auth, sessions | Feature 1 |
 | Owned lists CRUD and dashboard lists view | Feature 2 |
+| Owned todos CRUD and list-items dialogs | Feature 3 |
