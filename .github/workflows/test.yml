@@ -10,8 +10,6 @@ on:
 jobs:
   test-backend:
     runs-on: ubuntu-latest
-    env:
-      DB_PORT: 3306
     services:
       mysql:
         image: mysql:8

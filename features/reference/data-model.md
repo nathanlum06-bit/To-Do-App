@@ -1,6 +1,6 @@
 # Data Model Reference
 
-**Status:** current after Feature 3 (todos).
+**Status:** current after Feature 2 (lists).
 
 Sequelize adds `id`, `createdAt`, and `updatedAt` on each table.
 
@@ -36,26 +36,12 @@ Sequelize adds `id`, `createdAt`, and `updatedAt` on each table.
 | `name` | STRING(100) | Required; trimmed; max 100 characters |
 | `userId` | INTEGER FK | Required; references `users.id`; set from `req.user.id` on create; never changes |
 
-### `todos`
-
-| Field | Type | Rules |
-|-------|------|-------|
-| `id` | INTEGER PK | Auto-increment |
-| `listId` | INTEGER FK | Required; references `lists.id`; cascade on list delete |
-| `title` | STRING(255) | Required; trimmed; max 255 characters |
-| `completed` | BOOLEAN | Default `false` |
-| `userId` | INTEGER FK | Required; references `users.id`; set from `req.user.id` on create |
-
 ## Associations
 
 - `User` hasMany `Session` (`as: "sessions"`, `foreignKey: "userId"`)
 - `Session` belongsTo `User` (`as: "user"`, `foreignKey: "userId"`)
 - `User` hasMany `List` (`as: "lists"`, `foreignKey: "userId"`)
 - `List` belongsTo `User` (`as: "user"`, `foreignKey: "userId"`)
-- `List` hasMany `Todo` (`as: "todos"`, `foreignKey: "listId"`, `onDelete: CASCADE`)
-- `Todo` belongsTo `List` (`as: "list"`, `foreignKey: "listId"`)
-- `User` hasMany `Todo` (`as: "todos"`, `foreignKey: "userId"`)
-- `Todo` belongsTo `User` (`as: "user"`, `foreignKey: "userId"`)
 
 ## Feature provenance
 
@@ -63,4 +49,3 @@ Sequelize adds `id`, `createdAt`, and `updatedAt` on each table.
 |------|------------|
 | `users`, `sessions` | Feature 1 |
 | `lists` | Feature 2 |
-| `todos` | Feature 3 |

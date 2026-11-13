@@ -5,7 +5,6 @@ const dbConfig = {
   USER: process.env.DB_USER || "root",
   PASSWORD: process.env.DB_PW || "",
   DB: process.env.DB_NAME || "speckit-db",
-  PORT: Number(process.env.DB_PORT) || 3306,
   dialect: "mysql",
   pool: {
     max: 5,
