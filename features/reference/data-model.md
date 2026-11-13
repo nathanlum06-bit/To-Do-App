@@ -1,6 +1,6 @@
 # Data Model Reference
 
-**Status:** current after Feature 1 (auth).
+**Status:** current after Feature 2 (lists).
 
 Sequelize adds `id`, `createdAt`, and `updatedAt` on each table.
 
@@ -28,13 +28,24 @@ Sequelize adds `id`, `createdAt`, and `updatedAt` on each table.
 | `expirationDate` | DATE | Required; 24 hours from creation |
 | `userId` | INTEGER FK | Required, references `users.id` |
 
+### `lists`
+
+| Field | Type | Rules |
+|-------|------|-------|
+| `id` | INTEGER PK | Auto-increment |
+| `name` | STRING(100) | Required; trimmed; max 100 characters |
+| `userId` | INTEGER FK | Required; references `users.id`; set from `req.user.id` on create; never changes |
+
 ## Associations
 
 - `User` hasMany `Session` (`as: "sessions"`, `foreignKey: "userId"`)
 - `Session` belongsTo `User` (`as: "user"`, `foreignKey: "userId"`)
+- `User` hasMany `List` (`as: "lists"`, `foreignKey: "userId"`)
+- `List` belongsTo `User` (`as: "user"`, `foreignKey: "userId"`)
 
 ## Feature provenance
 
 | Area | Introduced |
 |------|------------|
 | `users`, `sessions` | Feature 1 |
+| `lists` | Feature 2 |

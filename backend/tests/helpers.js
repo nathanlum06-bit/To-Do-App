@@ -1,7 +1,7 @@
 import request from "supertest";
 import db from "../app/models/index.js";
 
-const { user: User, session: Session } = db;
+const { user: User, session: Session, list: List } = db;
 
 export const syncTestDatabase = async () => {
   await db.sequelize.sync({ force: true });
@@ -29,4 +29,13 @@ export const loginUser = async (app, overrides = {}) => {
   return request(app).post("/todo/login").send(body);
 };
 
-export { User, Session };
+export const authHeader = (token) => ({ Authorization: `Bearer ${token}` });
+
+export const createList = async (app, token, name, extra = {}) => {
+  return request(app)
+    .post("/todo/lists")
+    .set(authHeader(token))
+    .send({ name, ...extra });
+};
+
+export { User, Session, List };
