@@ -1,6 +1,6 @@
 # API Reference
 
-**Status:** current after Feature 4 (profile).
+**Status:** current after Feature 5 (due dates).
 
 Base path: `/todo`. Authenticated routes send `Authorization: Bearer <token>`.
 
@@ -18,9 +18,9 @@ Base path: `/todo`. Authenticated routes send `Authorization: Bearer <token>`.
 | `POST` | `/todo/lists` | Yes | Create a list owned by `req.user.id` |
 | `PUT` | `/todo/lists/:listId` | Yes | Rename an owned list |
 | `DELETE` | `/todo/lists/:listId` | Yes | Delete an owned list (todos cascade) |
-| `GET` | `/todo/lists/:listId/todos` | Yes | Todos in an owned list; incomplete first, then `createdAt` ascending |
-| `POST` | `/todo/lists/:listId/todos` | Yes | Add a todo to an owned list |
-| `PUT` | `/todo/todos/:id` | Yes | Update an owned todo (title and/or `completed`) |
+| `GET` | `/todo/lists/:listId/todos` | Yes | Todos in an owned list; incomplete first, then `createdAt` ascending; includes `dueDate` |
+| `POST` | `/todo/lists/:listId/todos` | Yes | Add a todo to an owned list; optional `dueDate` |
+| `PUT` | `/todo/todos/:id` | Yes | Update an owned todo (title, `completed`, and/or `dueDate`) |
 | `DELETE` | `/todo/todos/:id` | Yes | Delete an owned todo |
 
 ## Auth success payload (`POST /todo/register` `201`, `POST /todo/login` `200`)
@@ -78,6 +78,7 @@ Password hashes are never returned.
   "listId": 1,
   "title": "Buy milk",
   "completed": false,
+  "dueDate": "2026-07-15",
   "userId": 42,
   "createdAt": "2026-07-02T12:05:00.000Z",
   "updatedAt": "2026-07-02T12:05:00.000Z"
@@ -86,7 +87,7 @@ Password hashes are never returned.
 
 `GET /todo/lists/:listId/todos` returns an array of that shape. `DELETE /todo/todos/:id` returns `200` with `{ "message": "Todo with id=<id> deleted." }`.
 
-Create body: `{ "title": "Buy milk" }`. `userId` and `listId` are set from the session and route; client-supplied ownership fields are ignored. New todos default to `completed: false`.
+Create body: `{ "title": "Buy milk", "dueDate": "2026-07-15" }`. `dueDate` is optional (`YYYY-MM-DD` or omit/`null`). `userId` and `listId` are set from the session and route; client-supplied ownership fields are ignored. New todos default to `completed: false`. On `PUT`, omit `dueDate` to leave it unchanged; send `null` to clear it.
 
 ## Errors
 
@@ -109,6 +110,7 @@ Create body: `{ "title": "Buy milk" }`. `userId` and `listId` are set from the s
 | Invalid list id | `400` | `Invalid list id.` |
 | List not found or not owned | `404` | `List with id=<id> not found.` |
 | Empty todo title | `400` | `Todo title is required.` |
+| Invalid due date | `400` | `Due date must be a valid date in YYYY-MM-DD format.` |
 | Todo title longer than 255 | `400` | `Todo title must be 255 characters or fewer.` |
 | Invalid todo id | `400` | `Invalid todo id.` |
 | Todo not found or not owned | `404` | `Todo with id=<id> not found.` |
@@ -121,3 +123,4 @@ Create body: `{ "title": "Buy milk" }`. `userId` and `listId` are set from the s
 | List CRUD | Feature 2 |
 | Todo CRUD (list-scoped) | Feature 3 |
 | Profile GET / PUT (self only) | Feature 4 |
+| Optional todo `dueDate` | Feature 5 |

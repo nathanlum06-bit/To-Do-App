@@ -24,6 +24,36 @@ const validateTitle = (raw) => {
   return { title };
 };
 
+const DATE_ONLY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+const INVALID_DUE_DATE = "Due date must be a valid date in YYYY-MM-DD format.";
+
+const parseDueDate = (raw) => {
+  if (raw === undefined) {
+    return { omitted: true };
+  }
+
+  if (raw === null || raw === "") {
+    return { dueDate: null };
+  }
+
+  if (typeof raw !== "string" || !DATE_ONLY_REGEX.test(raw)) {
+    return { error: INVALID_DUE_DATE };
+  }
+
+  const [year, month, day] = raw.split("-").map(Number);
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+
+  if (
+    parsed.getUTCFullYear() !== year ||
+    parsed.getUTCMonth() !== month - 1 ||
+    parsed.getUTCDate() !== day
+  ) {
+    return { error: INVALID_DUE_DATE };
+  }
+
+  return { dueDate: raw };
+};
+
 exports.findAll = async (req, res) => {
   try {
     const listId = parseId(req.params.listId);
@@ -73,9 +103,16 @@ exports.create = async (req, res) => {
       return res.status(400).send({ message: error });
     }
 
+    const dueDateResult = parseDueDate(req.body.dueDate);
+
+    if (dueDateResult.error) {
+      return res.status(400).send({ message: dueDateResult.error });
+    }
+
     const todo = await Todo.create({
       title,
       completed: false,
+      dueDate: dueDateResult.omitted ? null : dueDateResult.dueDate,
       listId,
       userId: req.user.id,
     });
@@ -113,6 +150,16 @@ exports.update = async (req, res) => {
 
     if (req.body.completed !== undefined) {
       todo.completed = Boolean(req.body.completed);
+    }
+
+    if (req.body.dueDate !== undefined) {
+      const dueDateResult = parseDueDate(req.body.dueDate);
+
+      if (dueDateResult.error) {
+        return res.status(400).send({ message: dueDateResult.error });
+      }
+
+      todo.dueDate = dueDateResult.dueDate;
     }
 
     await todo.save();

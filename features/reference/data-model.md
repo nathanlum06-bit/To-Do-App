@@ -1,6 +1,6 @@
 # Data Model Reference
 
-**Status:** current after Feature 4 (profile).
+**Status:** current after Feature 5 (due dates).
 
 Sequelize adds `id`, `createdAt`, and `updatedAt` on each table.
 
@@ -44,6 +44,7 @@ Sequelize adds `id`, `createdAt`, and `updatedAt` on each table.
 | `listId` | INTEGER FK | Required; references `lists.id`; cascade on list delete |
 | `title` | STRING(255) | Required; trimmed; max 255 characters |
 | `completed` | BOOLEAN | Default `false` |
+| `dueDate` | DATEONLY | Nullable; optional calendar date (`YYYY-MM-DD`); `null` means no due date |
 | `userId` | INTEGER FK | Required; references `users.id`; set from `req.user.id` on create |
 
 ## Associations
@@ -65,3 +66,4 @@ Sequelize adds `id`, `createdAt`, and `updatedAt` on each table.
 | `lists` | Feature 2 |
 | `todos` | Feature 3 |
 | Profile edits on `users` (no new tables) | Feature 4 |
+| `todos.dueDate` | Feature 5 |

@@ -1,6 +1,6 @@
 # Behavior & Rules Reference
 
-**Living snapshot** of product rules currently in force (Feature 4).
+**Living snapshot** of product rules currently in force (Feature 5).
 
 These files answer: *"What rules does the app enforce right now?"*  
 They do **not** authorize new scope — implement only from `features/feature-*.md`.
@@ -55,6 +55,9 @@ They do **not** authorize new scope — implement only from `features/feature-*.
 | Titles trimmed; empty → `400`; over 255 chars → `400` | `validateTitle` | Feature 3 |
 | New todos default to `completed: false` | `Todo.create` | Feature 3 |
 | Todos ordered incomplete first, then `createdAt` ascending | `findAll` order | Feature 3 |
+| `dueDate` is optional DATEONLY (`YYYY-MM-DD`); omit/`null` on create → `null` | `todo.controller` create | Feature 5 |
+| Invalid `dueDate` → `400` `"Due date must be a valid date in YYYY-MM-DD format."` | `parseDueDate` | Feature 5 |
+| `PUT` omit `dueDate` leaves it unchanged; `dueDate: null` clears it | `todo.controller` update | Feature 5 |
 
 ## Client (UX, not enforcement)
 
@@ -76,6 +79,9 @@ They do **not** authorize new scope — implement only from `features/feature-*.
 | Empty todos copy: **"No todos in this list yet."** | `Dashboard.vue` | Feature 3 |
 | Empty todo title blocked client-side: **"Todo title is required."** | `Dashboard.vue` | Feature 3 |
 | Completed todos are struck-through / muted | `Dashboard.vue` `.todo-completed` | Feature 3 |
+| Add/edit item dialogs include optional due date (`type="date"`) | `Dashboard.vue` | Feature 5 |
+| Due dates display formatted (locale date); omitted when `null` | `formatDueDate` | Feature 5 |
+| Incomplete todos with `dueDate` before today use overdue styling | `isTodoOverdue` / `.todo-overdue` | Feature 5 |
 
 ## Feature provenance
 
@@ -85,3 +91,4 @@ They do **not** authorize new scope — implement only from `features/feature-*.
 | Owned lists CRUD and dashboard lists view | Feature 2 |
 | Owned todos CRUD and list-items dialogs | Feature 3 |
 | Self-only profile GET/PUT and menu-bar profile dropdown | Feature 4 |
+| Optional todo due dates and overdue styling | Feature 5 |
