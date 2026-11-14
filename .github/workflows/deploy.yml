@@ -30,6 +30,7 @@ jobs:
           npm run bundle
 
       - name: Deploy to server
+        if: ${{ secrets.SERVER_SSH_KEY != '' }}
         uses: easingthemes/ssh-deploy@main
         with:
           SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
@@ -38,6 +39,12 @@ jobs:
           SOURCE: frontend/dist/
           TARGET: ${{ secrets.FRONTEND_DEPLOY_TARGET }}
           ARGS: "-rltgoDzvO --delete"
+
+      - name: Skip SSH deploy when secrets are missing
+        if: ${{ secrets.SERVER_SSH_KEY == '' }}
+        run: |
+          echo "SSH deploy skipped: GitHub secret SERVER_SSH_KEY is not set."
+          echo "Tests and the production build succeeded. Add repo secrets to enable server deploy."
 
   deploy-backend:
     needs: test
@@ -83,6 +90,7 @@ jobs:
         run: npm run bundle
 
       - name: Deploy to server
+        if: ${{ secrets.SERVER_SSH_KEY != '' }}
         uses: easingthemes/ssh-deploy@main
         with:
           SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
@@ -93,6 +101,7 @@ jobs:
           TARGET: ${{ secrets.BACKEND_DEPLOY_TARGET }}
 
       - name: Restart API service on server
+        if: ${{ secrets.SERVER_SSH_KEY != '' }}
         uses: JimCronqvist/action-ssh@master
         with:
           hosts: "${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}"
@@ -105,3 +114,9 @@ jobs:
             sudo cp todo-speckit-backend.service /lib/systemd/system/todo-speckit-backend.service
             sudo systemctl daemon-reload
             sudo systemctl start todo-speckit-backend
+
+      - name: Skip SSH deploy when secrets are missing
+        if: ${{ secrets.SERVER_SSH_KEY == '' }}
+        run: |
+          echo "SSH deploy skipped: GitHub secret SERVER_SSH_KEY is not set."
+          echo "Tests and the production bundle succeeded. Add repo secrets to enable server deploy."
